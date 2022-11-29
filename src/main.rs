@@ -1,9 +1,14 @@
 use std::{
+    env,
     fs::File,
     io::{BufRead, BufReader, Write},
 };
 
 fn main() {
+    let args: Vec<String> = env::args().collect();
+    if args.len() != 2 {
+        panic!("Parameters count error!");
+    }
     let test: [char; 7] = ['A', 'T', 'O', 'M', ' ', ' ', '\0'];
     let mut line2: [char; 7] = [' '; 7];
     const SIZE: usize = 250000;
@@ -82,15 +87,12 @@ fn main() {
     let mut ir: f64;
     let mut z2: usize;
 
-    let filepath = String::from("./errat");
+    let filepath = args[1].clone();
     let logfilename = filepath.clone();
-    let resultfilename = filepath.clone();
     let filepath = filepath + ".pdb";
     let logfilename = logfilename + ".logf";
-    let resultfilename = resultfilename + ".txt";
 
     let mut fout = File::create(logfilename).expect("Failed opening errat.logf");
-    let mut rout = File::create(resultfilename).expect("Failed opening errat.txt");
 
     let mut lmt: [f64; 3] = [0.0; 3];
     lmt[2] = 11.526684477428809;
@@ -426,7 +428,7 @@ fn main() {
                             matrix[3] = (c[3][1] + c[1][3]) / temp2;
                             matrix[4] = c[2][2] / temp2;
                             matrix[5] = (c[3][2] + c[2][3]) / temp2;
-                            mtrx = matrixdb(matrix, &mut fout);
+                            mtrx = matrixdb(matrix);
                             stat += 1.0;
                             mtrxstat += mtrx;
                             if mtrx > lmt[1] {
@@ -465,14 +467,6 @@ fn main() {
         fout.write_all(format!("Avg Probability {}\n", mtrxstat / stat).as_bytes())
             .expect("write failed");
         fout.write_all(
-            format!(
-                "# Overall quality factor: {}\n",
-                100.0 - (100.0 * pstat / stat)
-            )
-            .as_bytes(),
-        )
-        .expect("write failed");
-        rout.write_all(
             format!(
                 "# Overall quality factor: {}\n",
                 100.0 - (100.0 * pstat / stat)
@@ -530,7 +524,7 @@ fn main() {
     }
 }
 
-fn matrixdb(mut matrix: [f64; 6], fout: &mut File) -> f64 {
+fn matrixdb(mut matrix: [f64; 6]) -> f64 {
     let mut c1: [[f64; 6]; 6] = [[0.0; 6]; 6];
     let mut d1: [[f64; 6]; 6] = [[0.0; 6]; 6];
     let avg: [f64; 6] = [
@@ -586,29 +580,29 @@ fn matrixdb(mut matrix: [f64; 6], fout: &mut File) -> f64 {
     ];
     let mut a: [[f64; 6]; 6] = [[0.0; 6]; 6];
     let mut b: [[f64; 6]; 6] = [[0.0; 6]; 6];
-    fout.write_all("PROCESSING FRAME STATISTICS:\n".as_bytes())
-        .expect("write failed");
+    // fout.write_all("PROCESSING FRAME STATISTICS:\n".as_bytes())
+    //     .expect("write failed");
 
     for u in 1..6 {
         matrix[u] = matrix[u] - avg[u];
     }
 
-    fout.write_all("Vertical Matrix A".as_bytes())
-        .expect("write failed");
+    // fout.write_all("Vertical Matrix A".as_bytes())
+    //     .expect("write failed");
     let m1 = 1;
     let p1 = 5;
     for u in 1..=m1 {
-        fout.write_all("\n".as_bytes()).expect("write failed");
+        // fout.write_all("\n".as_bytes()).expect("write failed");
         for v in 1..=p1 {
             a[v][u] = matrix[v];
             b[u][v] = matrix[v];
-            fout.write_all(format!("{}      ", a[v][u]).as_bytes())
-                .expect("write failed");
+            // fout.write_all(format!("{}      ", a[v][u]).as_bytes())
+            //     .expect("write failed");
         }
     }
     let n1 = 5;
-    fout.write_all(format!("\nMatrix Product AxB1 = C1 {} x {}", m1, n1).as_bytes())
-        .expect("write failed");
+    // fout.write_all(format!("\nMatrix Product AxB1 = C1 {} x {}", m1, n1).as_bytes())
+    //     .expect("write failed");
     for u in 1..=m1 {
         for v in 1..=n1 {
             let mut x: f64 = 0.0;
@@ -616,22 +610,22 @@ fn matrixdb(mut matrix: [f64; 6], fout: &mut File) -> f64 {
                 x = x + a[k1][u] * b1[v][k1];
             }
             c1[v][u] = x;
-            fout.write_all(format!("{}      ", c1[v][u]).as_bytes())
-                .expect("write failed");
+            // fout.write_all(format!("{}      ", c1[v][u]).as_bytes())
+            //     .expect("write failed");
         }
     }
 
-    fout.write_all("\nHorizontal Matrix B".as_bytes())
-        .expect("write failed");
+    // fout.write_all("\nHorizontal Matrix B".as_bytes())
+    //     .expect("write failed");
     let p1 = 5;
     let n1 = 1;
-    for u in 1..=p1 {
-        fout.write_all("\n".as_bytes()).expect("write failed");
-        for v in 1..=n1 {
-            fout.write_all(format!("{}      ", b[v][u]).as_bytes())
-                .expect("write failed");
-        }
-    }
+    // for u in 1..=p1 {
+    //     fout.write_all("\n".as_bytes()).expect("write failed");
+    //     for v in 1..=n1 {
+    //         fout.write_all(format!("{}      ", b[v][u]).as_bytes())
+    //             .expect("write failed");
+    //     }
+    // }
     for u in 1..=m1 {
         for v in 1..=n1 {
             let mut x: f64 = 0.0;
@@ -641,7 +635,7 @@ fn matrixdb(mut matrix: [f64; 6], fout: &mut File) -> f64 {
             d1[v][u] = x;
         }
     }
-    fout.write_all(format!("\nTotal Matrix\n{}      \n", d1[1][1]).as_bytes())
-        .expect("write failed");
+    // fout.write_all(format!("\nTotal Matrix\n{}      \n", d1[1][1]).as_bytes())
+    //     .expect("write failed");
     return d1[1][1];
 }
