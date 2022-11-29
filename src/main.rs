@@ -480,6 +480,7 @@ fn main() {
             .as_bytes(),
         )
         .expect("write failed");
+        print!("{}", 100.0 - (100.0 * pstat / stat));
         chainx = 1 + (resnum[atmnum] - 4) / 10000;
         z2 = 1;
         ir1[z2] = resnum[1] + 4;
