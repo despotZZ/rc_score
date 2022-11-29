@@ -108,8 +108,11 @@ fn main() {
     let mut i = 0;
     for line in fin.lines() {
         let line = line.unwrap().chars().collect::<Vec<char>>();
-        for i in 0..6 {
-            line2[i] = line[i];
+        if line[10] == 'D' && line[11] == 'N' && line[12] == 'A' {
+            panic!("This is a DNA")
+        }
+        for j in 0..6 {
+            line2[j] = line[j];
         }
         line2[6] = '\0';
         if line2 == test {
@@ -138,13 +141,13 @@ fn main() {
                 bnam[i] = 0;
             }
             alt_loc = line[16];
-            for i in 17..20 {
-                res_name[i - 17] = line[i];
+            for j in 17..20 {
+                res_name[j - 17] = line[j];
             }
             res_name[3] = '\0';
             chain_id[i] = line[21];
-            for i in 22..26 {
-                res_seq_temp[i - 22] = line[i];
+            for j in 22..26 {
+                res_seq_temp[j - 22] = line[j];
             }
             res_seq[i] = res_seq_temp
                 .iter()
@@ -152,16 +155,16 @@ fn main() {
                 .trim()
                 .parse::<i32>()
                 .unwrap();
-            for i in 30..38 {
-                x[i - 30] = line[i];
+            for j in 30..38 {
+                x[j - 30] = line[j];
             }
             xyz[i][0] = x.iter().collect::<String>().trim().parse::<f64>().unwrap();
-            for i in 38..46 {
-                y[i - 38] = line[i];
+            for j in 38..46 {
+                y[j - 38] = line[j];
             }
             xyz[i][1] = y.iter().collect::<String>().trim().parse::<f64>().unwrap();
-            for i in 46..54 {
-                z[i - 46] = line[i];
+            for j in 46..54 {
+                z[j - 46] = line[j];
             }
             xyz[i][2] = z.iter().collect::<String>().trim().parse::<f64>().unwrap();
             if !((alt_loc == ' ') || (alt_loc == 'A') || (alt_loc == 'a') || (alt_loc == 'P')) {
